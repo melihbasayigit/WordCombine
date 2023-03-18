@@ -46,15 +46,6 @@ public class WordController {
     }
 
     private String processWords(WordList wordList) {
-        // start process
-        String result = "";
-
-        int minIndex = wordList.getList().get(0).length();
-        for (int i=1; i<wordList.getList().size(); i++) {
-            if (minIndex < wordList.getList().get(i).length())
-                minIndex = wordList.getList().get(i).length();
-        }
-
 
         return "result";
     }
