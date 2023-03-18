@@ -17,14 +17,18 @@ public class WordList {
     private List<String> list;
     private String result;
     private long processTime;
+    private float similarityRate;
+    private float frequency;
 
     public WordList() {}
 
-    public WordList(String id, List<String> list, String result, long processTime) {
+    public WordList(String id, List<String> list, String result, long processTime, float similarityRate, float frequency) {
         this.id = id;
         this.list = list;
         this.result = result;
         this.processTime = processTime;
+        this.similarityRate = similarityRate;
+        this.frequency = frequency;
     }
 
     public String getId() {
@@ -57,5 +61,21 @@ public class WordList {
 
     public void setProcessTime(long processTime) {
         this.processTime = processTime;
+    }
+
+    public float getSimilarityRate() {
+        return similarityRate;
+    }
+
+    public void setSimilarityRate(float similarityRate) {
+        this.similarityRate = similarityRate;
+    }
+
+    public float getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(float frequency) {
+        this.frequency = frequency;
     }
 }
