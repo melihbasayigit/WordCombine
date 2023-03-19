@@ -1,5 +1,6 @@
 package com.melomanya.wordcombine.controller;
 
+import com.melomanya.wordcombine.model.SingleText;
 import com.melomanya.wordcombine.model.WordList;
 import com.melomanya.wordcombine.service.WordService;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,9 @@ public class WordController {
     }
 
     @PostMapping(path = "/insert")
-    public WordList insertWords(@RequestBody List<String> stringList) {
+    public WordList insertWords(@RequestBody List<SingleText> singleTextList) {
+        System.out.println("abc");
+        List<String> stringList = SingleText.convert(singleTextList);
         WordList wordList = createWordListClass(stringList);
         return service.save(wordList);
     }
