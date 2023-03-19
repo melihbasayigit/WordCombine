@@ -47,7 +47,7 @@ public class WordController {
     }
 
     private String processWords(WordList wordList) {
-        double similarityRate = 0.249999f;
+        double similarityRate = 0.199999f;
 
         return "result";
     }
