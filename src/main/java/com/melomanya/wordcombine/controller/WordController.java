@@ -34,16 +34,21 @@ public class WordController {
         System.out.println("abc");
         List<String> stringList = SingleText.convert(singleTextList);
         WordList wordList = createWordListClass(stringList);
+        return wordList;
+    }
+
+    @PostMapping(path = "/save")
+    public WordList save(@RequestBody WordList wordList) {
         return service.save(wordList);
     }
 
     private WordList createWordListClass(List<String> strList) {
-        long startMillis = System.currentTimeMillis();
+        long startMillis = System.nanoTime();
         System.out.println(startMillis);
         WordList ws = new WordList();
         ws.setList(strList);
         ws.setResult(processWords(ws));
-        long lastMillis = System.currentTimeMillis();
+        long lastMillis = System.nanoTime();
         System.out.println(lastMillis);
         ws.setProcessTime(lastMillis - startMillis);
         return ws;
@@ -55,8 +60,145 @@ public class WordController {
         return "result";
     }
 
+    public static String compare_2_strings(String _str1, String _str2) {
+        String[] str1 = _str1.split(" ");
+        String[] str2 = _str2.split(" ");
+        if (str1.length == str2.length && str1.length == 1) {
+            return compareWithChar(str1[0], str2[0]);
+        }
+        List<String> firstUniques = new ArrayList<>();
+        List<String> secondUniques = new ArrayList<>();
+        List<String> duplicated = new ArrayList<>();
+        boolean isFound = false;
+        int index = -1;
+        int counter = 0;
+        boolean finishTheLoop = false;
+        for (int i=0; i<str1.length; i++) {
+            if (finishTheLoop)
+                break;
+            for (int k=0; k<str2.length; k++) {
+                if (isFound && !str1[i].equals(str2[k])) {
+                    finishTheLoop = true;
+                    index = k+1;
+                    break;
+                }
+                if (str1[i].equals(str2[k])) {
+                    isFound = true;
+                    duplicated.add(str1[i]);
+                    counter++;
+                    break;
+                }
+            }
+            if (!isFound) {
+                firstUniques.add(str1[i]);
+            }
+        }
+        if (index == -1) {
+            return _str1;
+        }
+        else {
+            for (int i = index; i<str2.length; i++) {
+                secondUniques.add(str2[i]);
+            }
+        }
+        firstUniques.addAll(duplicated);
+        firstUniques.addAll(secondUniques);
+        return String.join(" ", firstUniques);
+        /*
+        if ((float)counter / (float)str1.length > 0.19f || (float)counter / (float)str2.length > 0.19f) {
+            return firstUniques + " " + duplicated + " " + secondUniques;
+
+        }
+        else {
+            return _str1;
+        }
+        */
+
+        /*
+         * ÖNCE KELİME
+         * KELİME BULAMAZSA
+         * CHAR TABANLI KONTROL ET
+         * %80 ÜSTÜ AYNI KELİME İSE ÇATŞIYA ( BİR TANESİ GEÇERSE OK'LE)
+         * */
+
+        /*
+         * BİRLEŞTİRMEYE ÇALIŞ
+         * KELİME BAZLI BAK
+         * HİÇ OLMUYORSA EKLEME ASIL RESULTTAN GİT
+         * */
+    }
+
+    private static String compareWithChar(String _str1, String _str2) {
+        char[] str1 = _str1.toCharArray();
+        char[] str2 = _str2.toCharArray();
+        String firstUniques = "";
+        String secondUniques = "";
+        String duplicated = "";
+        boolean isFound = false;
+        for (int i = 0; i< str1.length; i++) {
+            for (int k=0; k < str2.length; k++) {
+                if (str1[i] == str2[k]) {
+                    isFound = true;
+                    duplicated += str1[i];
+                    break;
+                }
+                else {
+                    if (isFound) {
+                        secondUniques += str2[k];
+                    }
+                    else {
+                        firstUniques += str1[i];
+                    }
+                }
+            }
+            if (!isFound) {
+                firstUniques += str1[i];
+            }
+        }
+
+        if (!isFound) {
+            return null;
+        }
+        return firstUniques + duplicated + secondUniques;
+    }
+
+    private static String process(int startIndex, List<String> stringList) {
+        System.out.println(startIndex);
+        System.out.println(stringList);
+        boolean isFound = false;
+        if (startIndex >= stringList.size() - 1) {
+            return stringList.get(0);
+        }
+        for (int i=1+startIndex; i<stringList.size(); i++) {
+            String result = compare_2_strings(stringList.get(startIndex), stringList.get(i));
+            if (!stringList.get(startIndex).equals(result)) {
+                // bu iki diziyi birlestir ilk dizi olarak ata
+                // 1 2 3 geldi
+                // 1+2 3 seklinde iki dizi olarak cikti
+                System.out.println("buldu");
+                stringList.set(0, result);
+                stringList.remove(i);
+                isFound = true;
+                process(startIndex, stringList);
+                break;
+            }
+        }
+        if (!isFound) {
+            process(startIndex+1, stringList);
+        }
+        return stringList.get(0);
+    }
+
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
+        List<String> stringList = new ArrayList<>();
+        stringList.add("Ali eve gel");
+        stringList.add("eve gelme dükkana geç");
+        stringList.add("Ahmet dun gec kaldi");
+        stringList.add("dükkana gitmeden yemek yemeyi unutma");
+        System.out.println(process(0, stringList));
+
+
+        /*
         list.add("The weather is the most important subject in the land. In Europe, \n" +
                 "people say, ‘He is the type of person who talks about the \n" +
                 "weather,’ to show that somebody is very boring. In England, the \n" +
@@ -90,7 +232,7 @@ public class WordController {
                 "began, and made England his home for the rest of his life. During \n" +
                 "the war he worked for the BBC, making radio programmes for \n" +
                 "Hungary.");
-
+            */
 
     }
 

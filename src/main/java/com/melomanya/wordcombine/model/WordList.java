@@ -18,7 +18,6 @@ public class WordList {
     private String result;
     private long processTime;
     private float similarityRate;
-    private float frequency;
 
     public WordList() {}
 
@@ -28,7 +27,6 @@ public class WordList {
         this.result = result;
         this.processTime = processTime;
         this.similarityRate = similarityRate;
-        this.frequency = frequency;
     }
 
     public String getId() {
@@ -69,13 +67,5 @@ public class WordList {
 
     public void setSimilarityRate(float similarityRate) {
         this.similarityRate = similarityRate;
-    }
-
-    public float getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(float frequency) {
-        this.frequency = frequency;
     }
 }
