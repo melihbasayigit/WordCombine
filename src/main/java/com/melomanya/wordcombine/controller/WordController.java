@@ -12,7 +12,7 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping("/api/word")
 public class WordController {
-
+    static final double similarityRate = 0.199999f;
     private final WordService service;
 
     public WordController(WordService service) {
@@ -55,9 +55,7 @@ public class WordController {
     }
 
     private String processWords(WordList wordList) {
-        double similarityRate = 0.199999f;
-
-        return "result";
+        return process(0, wordList.getList());
     }
 
     public static String compare_2_strings(String _str1, String _str2) {
@@ -235,8 +233,12 @@ public class WordController {
             */
 
     }
-
-
-
-
 }
+
+
+/*
+*  BENZERLIK ORANI KONTROLU
+*  GERI LISTE MI DONERECEK YOKSA TEK STRING MI KARAR VER
+*  CHAR BAZLI KARSILASTIRMA ALGORITMASINI EKLE
+*  NGRAM KULLANAN BIR ALGORITMA DAHA EKLE VE KARSILASTIR
+* */
