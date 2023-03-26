@@ -13,6 +13,8 @@ import java.util.List;
 @RequestMapping("/api/word")
 public class WordController {
     static final double similarityRate = 0.199999f;
+
+    static float totalSimilarityRate = 0;
     private final WordService service;
 
     public WordController(WordService service) {
@@ -34,33 +36,38 @@ public class WordController {
         System.out.println("abc");
         List<String> stringList = SingleText.convert(singleTextList);
         WordList wordList = createWordListClass(stringList);
+        System.out.println(totalSimilarityRate);
+        wordList.setSimilarityRate((totalSimilarityRate / (float) wordList.getList().size()));
+        totalSimilarityRate = 0;
+        System.out.println(wordList);
         return wordList;
     }
 
     @PostMapping(path = "/save")
     public WordList save(@RequestBody WordList wordList) {
+        System.out.println("SAVE");
         return service.save(wordList);
     }
 
     private WordList createWordListClass(List<String> strList) {
         long startMillis = System.nanoTime();
-        System.out.println(startMillis);
         WordList ws = new WordList();
         ws.setList(strList);
         ws.setResult(processWords(ws));
+        //ws.setResult("result");
         long lastMillis = System.nanoTime();
-        System.out.println(lastMillis);
         ws.setProcessTime(lastMillis - startMillis);
         return ws;
     }
 
-    private String processWords(WordList wordList) {
+    private List<String> processWords(WordList wordList) {
         return process(0, wordList.getList());
     }
 
     public static String compare_2_strings(String _str1, String _str2) {
         String[] str1 = _str1.split(" ");
         String[] str2 = _str2.split(" ");
+
         if (str1.length == str2.length && str1.length == 1) {
             return compareWithChar(str1[0], str2[0]);
         }
@@ -98,6 +105,15 @@ public class WordController {
             for (int i = index; i<str2.length; i++) {
                 secondUniques.add(str2[i]);
             }
+        }
+        int total;
+        if (str1.length < str2.length)
+            total = str1.length;
+        else
+            total = str2.length;
+        if ((float)counter / (float)total < 0.1999f) {
+            totalSimilarityRate += (float)counter / (float)total;
+            return _str1;
         }
         firstUniques.addAll(duplicated);
         firstUniques.addAll(secondUniques);
@@ -160,19 +176,17 @@ public class WordController {
         return firstUniques + duplicated + secondUniques;
     }
 
-    private static String process(int startIndex, List<String> stringList) {
+    private static List<String> process(int startIndex, List<String> _stringList) {
+        List<String> stringList = new ArrayList<>(_stringList);
         System.out.println(startIndex);
         System.out.println(stringList);
         boolean isFound = false;
         if (startIndex >= stringList.size() - 1) {
-            return stringList.get(0);
+            return stringList;
         }
         for (int i=1+startIndex; i<stringList.size(); i++) {
             String result = compare_2_strings(stringList.get(startIndex), stringList.get(i));
             if (!stringList.get(startIndex).equals(result)) {
-                // bu iki diziyi birlestir ilk dizi olarak ata
-                // 1 2 3 geldi
-                // 1+2 3 seklinde iki dizi olarak cikti
                 System.out.println("buldu");
                 stringList.set(0, result);
                 stringList.remove(i);
@@ -184,7 +198,35 @@ public class WordController {
         if (!isFound) {
             process(startIndex+1, stringList);
         }
-        return stringList.get(0);
+        return stringList;
+    }
+
+    static int compareChars(String myString,String myString2) {
+        float shortOne=0;
+        float cont=0;
+
+        if(myString.length()>myString2.length()){
+            shortOne=myString2.length();
+        }else{
+            shortOne=myString.length();
+        }
+
+        for (int i = 0; i < shortOne; i++){
+            if(myString.charAt(i)!=myString2.charAt(i)){
+                cont = i;
+                break;
+            }else{
+                if(i+1==shortOne){
+                    cont = i+1;
+                }else {
+                }
+            }
+        }
+        if(cont/shortOne > 0.4){
+            return 1;
+        }else{
+            return 0;
+        }
     }
 
     public static void main(String[] args) {
@@ -193,12 +235,11 @@ public class WordController {
         stringList.add("eve gelme dükkana geç");
         stringList.add("Ahmet dun gec kaldi");
         stringList.add("dükkana gitmeden yemek yemeyi unutma");
-        System.out.println(process(0, stringList));
-
+        //System.out.println(process(0, stringList));
 
         /*
         list.add("The weather is the most important subject in the land. In Europe, \n" +
-                "people say, ‘He is the type of person who talks about the \n" +
+                "people say, ‘He is the  type of person who talks about the \n" +
                 "weather,’ to show that somebody is very boring. In England, the \n" +
                 "weather is always an interesting, exciting subject and you must be \n" +
                 "good at talking about it.");
@@ -237,8 +278,5 @@ public class WordController {
 
 
 /*
-*  BENZERLIK ORANI KONTROLU
-*  GERI LISTE MI DONERECEK YOKSA TEK STRING MI KARAR VER
 *  CHAR BAZLI KARSILASTIRMA ALGORITMASINI EKLE
-*  NGRAM KULLANAN BIR ALGORITMA DAHA EKLE VE KARSILASTIR
 * */

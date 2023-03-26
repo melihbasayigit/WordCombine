@@ -15,13 +15,13 @@ public class WordList {
     private String id;
 
     private List<String> list;
-    private String result;
+    private List<String> result;
     private long processTime;
     private float similarityRate;
 
     public WordList() {}
 
-    public WordList(String id, List<String> list, String result, long processTime, float similarityRate, float frequency) {
+    public WordList(String id, List<String> list, List<String> result, long processTime, float similarityRate) {
         this.id = id;
         this.list = list;
         this.result = result;
@@ -45,11 +45,11 @@ public class WordList {
         this.list = list;
     }
 
-    public String getResult() {
+    public List<String> getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(List<String> result) {
         this.result = result;
     }
 
