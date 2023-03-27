@@ -12,8 +12,6 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping("/api/word")
 public class WordController {
-    static final double similarityRate = 0.199999f;
-
     static float totalSimilarityRate = 0;
     private final WordService service;
 
@@ -54,14 +52,17 @@ public class WordController {
         WordList ws = new WordList();
         ws.setList(strList);
         ws.setResult(processWords(ws));
-        //ws.setResult("result");
         long lastMillis = System.nanoTime();
         ws.setProcessTime(lastMillis - startMillis);
         return ws;
     }
 
     private List<String> processWords(WordList wordList) {
-        return process(0, wordList.getList());
+        String result = select(wordList.getList().toArray(new String[0]));
+        List<String> stringList = new ArrayList<>();
+        stringList.add(result);
+        return stringList;
+        //return process(0, wordList.getList());
     }
 
     public static String compare_2_strings(String _str1, String _str2) {
@@ -69,7 +70,7 @@ public class WordController {
         String[] str2 = _str2.split(" ");
 
         if (str1.length == str2.length && str1.length == 1) {
-            return compareWithChar(str1[0], str2[0]);
+            //return compareWithChar(str1[0], str2[0]);
         }
         List<String> firstUniques = new ArrayList<>();
         List<String> secondUniques = new ArrayList<>();
@@ -118,22 +119,6 @@ public class WordController {
         firstUniques.addAll(duplicated);
         firstUniques.addAll(secondUniques);
         return String.join(" ", firstUniques);
-        /*
-        if ((float)counter / (float)str1.length > 0.19f || (float)counter / (float)str2.length > 0.19f) {
-            return firstUniques + " " + duplicated + " " + secondUniques;
-
-        }
-        else {
-            return _str1;
-        }
-        */
-
-        /*
-         * ÖNCE KELİME
-         * KELİME BULAMAZSA
-         * CHAR TABANLI KONTROL ET
-         * %80 ÜSTÜ AYNI KELİME İSE ÇATŞIYA ( BİR TANESİ GEÇERSE OK'LE)
-         * */
 
         /*
          * BİRLEŞTİRMEYE ÇALIŞ
@@ -185,8 +170,9 @@ public class WordController {
             return stringList;
         }
         for (int i=1+startIndex; i<stringList.size(); i++) {
-            String result = compare_2_strings(stringList.get(startIndex), stringList.get(i));
-            if (!stringList.get(startIndex).equals(result)) {
+            //String result = compare_2_strings(stringList.get(startIndex), stringList.get(i));
+            String result = compareWords(stringList.get(startIndex), stringList.get(i));
+            if (!result.isEmpty()) {
                 System.out.println("buldu");
                 stringList.set(0, result);
                 stringList.remove(i);
@@ -201,32 +187,169 @@ public class WordController {
         return stringList;
     }
 
-    static int compareChars(String myString,String myString2) {
-        float shortOne=0;
-        float cont=0;
+    static int compareChars(String myString, String myString2) {
+        float shortOne = 0;
+        float cont = 0;
+        int control = 1;
 
-        if(myString.length()>myString2.length()){
-            shortOne=myString2.length();
-        }else{
-            shortOne=myString.length();
+        if (myString.length() > myString2.length()) {
+            shortOne = myString2.length();
+        } else {
+            shortOne = myString.length();
         }
 
-        for (int i = 0; i < shortOne; i++){
-            if(myString.charAt(i)!=myString2.charAt(i)){
+        if (myString.length() < 4 || myString2.length() < 4) {
+            for (int i = 0; i < shortOne; i++) {
+                if (myString.charAt(i) != myString2.charAt(i)) {
+                    control = 0;
+                }
+            }
+            if (control == 0) {
+                return 0;
+            } else {
+                return 1;
+            }
+
+        }
+
+        for (int i = 0; i < shortOne; i++) {
+            if (myString.charAt(i) != myString2.charAt(i)) {
                 cont = i;
                 break;
-            }else{
-                if(i+1==shortOne){
-                    cont = i+1;
-                }else {
+            } else {
+                if (i + 1 == shortOne) {
+                    cont = i + 1;
+                } else {
+                    continue;
                 }
             }
         }
-        if(cont/shortOne > 0.4){
+        if (cont / shortOne > 0.5) {
             return 1;
-        }else{
+        } else {
             return 0;
         }
+    }
+
+    static String addFront(int i, int j, String str1[], String str2[]) {// bri gelimeninöncesi varsa onu eklemek için
+        String myString = "";
+        if (i != 0) {
+            if (j != 0) {
+                if (i > j) {
+                    for (int k = 0; k < i; k++) {
+                        myString = myString + " " + str1[k];
+                    }
+                } else {
+                    for (int k = 0; k < j; k++) {
+                        myString = myString + " " + str2[k];
+                    }
+
+                }
+            } else {
+                for (int k = 0; k < i; k++) {
+                    myString = myString + " " + str1[k];
+                }
+            }
+        } else if (j != 0) {
+            for (int k = 0; k < j; k++) {
+                myString = myString + " " + str2[k];
+            }
+        }
+        return myString.trim();
+    }
+
+    static String addBack(int i, String[] str, String myString) {
+        for (int k = i; k < str.length; k++) {
+            myString = myString + " " + str[k];
+        }
+        return myString.trim();
+    }
+
+    static String compareWords(String _str1, String _str2) {
+        String[] str1 = _str1.split(" ");
+        String[] str2 = _str2.split(" ");
+        String myString = "";
+        boolean addFrotnCont = true;
+
+        for (int i = 0; i < str1.length; i++) {
+            for (int j = 0; j < str2.length; j++) {
+                if (!str1[i].equalsIgnoreCase(str2[j])) {
+                    if (compareChars(str1[i], str2[j]) == 1) {
+                        if (addFrotnCont == true) {
+                            myString = addFront(i, j, str1, str2);
+                            addFrotnCont = false;
+                        }
+
+                        if (str1[i].length() > str2[j].length()) {
+                            myString = myString + " " + str1[i];
+                        } else {
+                            myString = myString + " " + str2[j];
+                        }
+
+                        if (i + 1 != str1.length) {
+                            myString = addBack(i + 1, str1, myString);
+                        } else if (j + 1 != str2.length) {
+                            myString = addBack(j + 1, str2, myString);
+                        }
+
+                        return myString.trim();
+                    }
+                } else {
+                    if (addFrotnCont == true) {
+                        myString = addFront(i, j, str1, str2);
+                        addFrotnCont = false;
+                    }
+
+                    if (j + 1 == str2.length) {
+                        myString = addBack(i, str1, myString);
+                        return myString.trim();
+                    }
+
+                    if (i + 1 != str1.length) {
+                        i++;
+                    } else {
+                        myString = addBack(j, str2, myString);
+                    }
+                }
+            }
+        }
+        return myString.trim();
+
+    }
+
+    static String select(String[] stringList) {
+        String myString = "";
+        String tempString = stringList[0];
+        for (int i = 0; i < stringList.length - 1; i++) {
+            for (int j = i + 1; j < stringList.length; j++) {
+                tempString = compareWords(stringList[i], stringList[j]);
+                if (tempString.length() > myString.length()) {
+                    myString = tempString;
+                }
+                tempString = compareWords(myString, stringList[j]);
+                if (tempString.length() > myString.length()) {
+                    myString = tempString;
+                }
+            }
+
+        }
+        for (int i = 0; i < stringList.length - 1; i++) {
+            for (int j = i + 1; j < stringList.length; j++) {
+                tempString = compareWords(stringList[i], stringList[j]);
+                if (tempString.length() > myString.length()) {
+                    myString = tempString;
+                }
+                tempString = compareWords(myString, stringList[j]);
+                if (tempString.length() > myString.length()) {
+                    myString = tempString;
+                }
+            }
+
+        }
+
+
+
+        return myString;
     }
 
     public static void main(String[] args) {
@@ -234,7 +357,8 @@ public class WordController {
         stringList.add("Ali eve gel");
         stringList.add("eve gelme dükkana geç");
         stringList.add("Ahmet dun gec kaldi");
-        stringList.add("dükkana gitmeden yemek yemeyi unutma");
+        stringList.add("gelme dükkana gitmeden yemek yemeyi unutma");
+        System.out.println(select(stringList.toArray(stringList.toArray(new String[0]))));
         //System.out.println(process(0, stringList));
 
         /*
