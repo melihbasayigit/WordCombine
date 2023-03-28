@@ -301,14 +301,14 @@ public class WordController {
                     }
 
                     if (j + 1 == str2.length) {
-                        myString = addBack(i, str1, myString);
+                        myString = addBack(i-1, str1, myString);
                         return myString.trim();
                     }
 
                     if (i + 1 != str1.length) {
                         i++;
                     } else {
-                        myString = addBack(j, str2, myString);
+                        myString = addBack(j-1, str2, myString);
                     }
                 }
             }
@@ -355,9 +355,13 @@ public class WordController {
     public static void main(String[] args) {
         List<String> stringList = new ArrayList<>();
         stringList.add("Ali eve gel");
-        stringList.add("eve gelme dükkana geç");
-        stringList.add("Ahmet dun gec kaldi");
-        stringList.add("gelme dükkana gitmeden yemek yemeyi unutma");
+        stringList.add("eve gel sonra");
+        stringList.add("eve gel sonra çarşı");
+        stringList.add("çarşıya git");
+        //stringList.add("Ali eve gel");
+        //stringList.add("eve gelme dükkana git");
+        //stringList.add("Ahmet dun gec kaldi");
+        //stringList.add("gelme dükkana geçmeden yemek yemeyi unutma");
         System.out.println(select(stringList.toArray(stringList.toArray(new String[0]))));
         //System.out.println(process(0, stringList));
 
