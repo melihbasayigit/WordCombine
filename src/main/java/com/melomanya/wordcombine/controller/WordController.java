@@ -119,12 +119,6 @@ public class WordController {
         firstUniques.addAll(duplicated);
         firstUniques.addAll(secondUniques);
         return String.join(" ", firstUniques);
-
-        /*
-         * BİRLEŞTİRMEYE ÇALIŞ
-         * KELİME BAZLI BAK
-         * HİÇ OLMUYORSA EKLEME ASIL RESULTTAN GİT
-         * */
     }
 
     private static String compareWithChar(String _str1, String _str2) {
@@ -361,13 +355,9 @@ public class WordController {
     public static void main(String[] args) {
         List<String> stringList = new ArrayList<>();
         stringList.add("Ali eve gel");
-        stringList.add("eve gel sonra");
-        stringList.add("eve gel sonra çarşı");
-        stringList.add("çarşıya git");
-        //stringList.add("Ali eve gel");
-        //stringList.add("eve gelme dükkana git");
-        //stringList.add("Ahmet dun gec kaldi");
-        //stringList.add("gelme dükkana geçmeden yemek yemeyi unutma");
+        stringList.add("eve gelme dükkana git");
+        stringList.add("Ahmet dun gec kaldi");
+        stringList.add("gelme dükkana geçmeden yemek yemeyi unutma");
         System.out.println(select(stringList.toArray(stringList.toArray(new String[0]))));
         //System.out.println(process(0, stringList));
 
@@ -409,8 +399,3 @@ public class WordController {
 
     }
 }
-
-
-/*
-*  CHAR BAZLI KARSILASTIRMA ALGORITMASINI EKLE
-* */
