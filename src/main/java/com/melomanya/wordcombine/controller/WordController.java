@@ -301,14 +301,20 @@ public class WordController {
                     }
 
                     if (j + 1 == str2.length) {
-                        myString = addBack(i-1, str1, myString);
+                        //if(i-1>=0)
+                        myString = addBack(i, str1, myString);
                         return myString.trim();
                     }
 
                     if (i + 1 != str1.length) {
                         i++;
                     } else {
-                        myString = addBack(j-1, str2, myString);
+                        if(j-1>=0){
+                            myString = addBack(j-1, str2, myString);
+                        }else{
+                            myString = addBack(j, str2, myString);
+                        }
+
                     }
                 }
             }
